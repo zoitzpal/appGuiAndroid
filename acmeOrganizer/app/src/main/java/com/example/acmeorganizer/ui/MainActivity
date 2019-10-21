@@ -1,0 +1,81 @@
+public class MainActivity extends AppCompatActivity {
+    private TextView mPriceTextView;
+    private String BASE_URL = "https://apiv2.bitcoinaverage.com/indices/global/ticker/BTC";
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        setContentView(R.layout.activity_main);
+
+        mPriceTextView = (TextView) findViewById(R.id.priceLabel);
+        Button btnUSD = (Button) findViewById(R.id.btnUSD);
+        Button btnZAR = (Button) findViewById(R.id.btnZAR);
+        Button btnAUD = (Button) findViewById(R.id.btnAUD);
+
+        //When clicking on this button, the bitcoin price is displayed in the
+        //mPriceTextView in USD
+        btnUSD.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                requestData(BASE_URL + "USD");
+            }
+        });
+
+        //When clicking on this button, the bitcoin price is displayed in the
+        //mPriceTextView in ZAR
+        btnZAR.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                requestData(BASE_URL + "ZAR");
+            }
+        });
+
+        //When clicking on this button, the bitcoin price is displayed in the
+        //mPriceTextView in AUD
+        btnAUD.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                requestData(BASE_URL + "AUD");
+            }
+        });
+    }
+
+    private void requestData(String url) {
+        RequestPackage requestPackage = new RequestPackage();
+        requestPackage.setMethod("GET");
+        requestPackage.setUrl(url);
+
+        Downloader downloader = new Downloader(); //Instantiation of the Async task
+        //that’s defined below
+
+        downloader.execute(requestPackage);
+    }
+
+    private class Downloader extends AsyncTask<RequestPackage, String, String> {
+        @Override
+        protected String doInBackground(RequestPackage... params) {
+            return HttpManager.getData(params[0])
+        }
+
+        //The String that is returned in the doInBackground() method is sent to the
+        // onPostExecute() method below. The String should contain JSON data.
+        @Override
+        protected void onPostExecute(String result) {
+            try {
+                //We need to convert the string in result to a JSONObject
+                JSONObject jsonObject = new JSONObject(result);
+
+                //The “ask” value below is a field in the JSON Object that was
+                //retrieved from the BitcoinAverage API. It contains the current
+                //bitcoin price
+                String price = jsonObject.getString("ask");
+
+                //Now we can use the value in the mPriceTextView
+                mPriceTextView.setText(price);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+}
