@@ -1,6 +1,6 @@
 public class MainActivity extends AppCompatActivity {
     private TextView mPriceTextView;
-    private String BASE_URL = "insert url here";
+    private String BASE_URL = "https://csc443-user-authentication-api.herokuapp.com";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
